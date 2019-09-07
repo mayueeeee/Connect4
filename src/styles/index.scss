@@ -1,0 +1,14 @@
+@import "~bulma/bulma.sass";
+
+body{
+  height: auto;
+  min-height: 100vh;
+  background-color: #233140;
+}
+
+.game-board{
+  margin: 20px;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: #fff;
+}
