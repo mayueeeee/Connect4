@@ -1,9 +1,7 @@
 import React, { Component } from 'react'
 
 export default class Node extends Component {
-
-  renderTable = (boardState) => {
-
+  renderTable = boardState => {
     let table = []
 
     for (let y = 0; y < 6; y++) {
@@ -15,7 +13,6 @@ export default class Node extends Component {
     }
 
     return table
-
   }
 
   render() {
@@ -23,12 +20,18 @@ export default class Node extends Component {
     return (
       <>
         <table className="node-board" style={{ height: 200 }}>
-          <tbody>
-            {this.renderTable(nodeData.boardState)}
-          </tbody>
+          <tbody>{this.renderTable(nodeData.boardState)}</tbody>
         </table>
-        <div style={{ backgroundColor: '#fff', textAlign: 'center', width: 200 }}>
-          {nodeData.depth === 0 ? 'ROOT' : `Depth : ${nodeData._depth + 1} Action : ${nodeData._action}`}
+        <div
+          style={{
+            backgroundColor: '#fff',
+            textAlign: 'center',
+            width: 200,
+          }}
+        >
+          {nodeData.depth === 0
+            ? 'ROOT'
+            : `Depth : ${nodeData._depth + 1} Action : ${nodeData._action}`}
         </div>
       </>
     )
