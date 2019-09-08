@@ -10,7 +10,9 @@ export default class IndexPage extends React.Component {
           <Board />
         </div>
         <div className="column">
-          <TreeView />
+          <div style={{ backgroundColor: '#fafafa' }}>
+            <TreeView />
+          </div>
         </div>
       </div>
     )
