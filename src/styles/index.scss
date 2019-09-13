@@ -1,5 +1,7 @@
 @import "~bulma/bulma.sass";
 
+
+//18bc9c  191919 f30154
 body{
   height: auto;
   min-height: 100vh;
@@ -11,4 +13,11 @@ body{
   padding: 20px;
   border-radius: 20px;
   background-color: #fff;
+}
+
+.game-row :hover{
+  background-color: #a1aab3;
+  z-index: -1;
+
+
 }
