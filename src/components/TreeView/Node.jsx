@@ -19,7 +19,13 @@ export default class Node extends Component {
     const { nodeData } = this.props
     return (
       <>
-        <table className="node-board" style={{ height: 200 }}>
+        <table
+          onClick={() => {
+            console.log(nodeData)
+          }}
+          className="node-board"
+          style={{ height: 200 }}
+        >
           <tbody>{this.renderTable(nodeData.boardState)}</tbody>
         </table>
         <div
