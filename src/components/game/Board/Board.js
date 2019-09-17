@@ -13,7 +13,7 @@ export default class Board extends React.Component {
 
         return (
             <div className="game-board">
-                <div className="columns is-centered">
+                <div className="columns">
                     {yay.map((row, i) => (
                         <Row key={i} data={row} onClick={e => this.onRowClick(i)}/>
                     ))}
