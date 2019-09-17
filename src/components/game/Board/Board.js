@@ -7,6 +7,8 @@ export default class Board extends React.Component {
         board: Array(7)
             .fill(0)
             .map(x => Array(6).fill('blank')),
+
+        turn: 0
     }
 
     yay = () => {
@@ -15,12 +17,26 @@ export default class Board extends React.Component {
         bibi[0][1] = 'green'
         this.setState({ board: bibi })
     }
+
+
+    onRowClick = (rowNum,color)=>{
+
+        console.log("Row ",rowNum," Color ",color)
+
+
+    }
+
+
+
+
+
     render() {
+        console.log(this.state.board)
         return (
             <div className="game-board">
                 <div className="columns is-centered">
                     {this.state.board.map((row, i) => (
-                        <Row key={i} data={row} hover={this.yay}/>
+                        <Row key={i} data={row} onClick={this.onRowClick}/>
                     ))}
                 </div>
             </div>
