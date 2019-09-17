@@ -1,20 +1,22 @@
 import React from 'react';
 import Board from "../components/game/Board/Board";
-export default class IndexPage extends React.Component{
+import TreeView from '../components/TreeView/TreeView'
+export default class IndexPage extends React.Component {
 
-    render() {
-        return (
-            <div className="columns">
-                <div className="column">
-                    <Board/>
-                </div>
-                <div className="column">
-                    Second column
-                </div>
-
-            </div>
-        )
-    }
+  render() {
+    return (
+      <div className="columns">
+        <div className="column">
+          <Board />
+        </div>
+        <div className="column">
+          <div style={{ backgroundColor: '#fafafa' }}>
+            <TreeView />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
 }
 

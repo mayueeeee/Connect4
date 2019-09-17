@@ -1,18 +1,27 @@
 @import "~bulma/bulma.sass";
 
-
-//18bc9c  191919 f30154
-body{
+body {
   height: auto;
   min-height: 100vh;
   background-color: #233140;
 }
 
-.game-board{
+.game-board {
   margin: 20px;
   padding: 20px;
   border-radius: 20px;
   background-color: #fff;
+}
+
+.node-board {
+  border-radius: 5px;
+  background-color: #fff;
+  width: 200px;
+  text-align: center;
+  .column {
+    padding: 0;
+  }
+
 }
 
 .game-row :hover{
