@@ -12,45 +12,22 @@ export default class Board extends React.Component {
         turn: 0,
     }
 
-    yay = () => {
-        console.log('yay')
-        let bibi = this.state.board
-        bibi[0][1] = 'green'
-        this.setState({ board: bibi })
-    }
-
-
-    onRowClick = (rowNum, color) => {
-
+    onRowClick = (rowNum) => {
+        const color = this.state.turn == 0 ? 'red' : 'green'
         console.log('Row ', rowNum, ' Color ', color)
-        const yay = lastIndexOf(this.state.board[rowNum],"blank")
-        let bibi = this.state.board
-        bibi[rowNum][yay] = 'green'
-        this.setState({ board: bibi })
-
-
-
-
-        if(this.state.turn=0){
-            console.log("ai jaa")
-        }
-
-        else{
-            console.log("human jaa")
-        }
-        this.setState({ turn: Math.abs(this.state.turn - 1) },()=>console.log("turn ",this.state.turn))
-
-
+        const lastBlank = lastIndexOf(this.state.board[rowNum], 'blank')
+        let tmp = this.state.board
+        tmp[rowNum][lastBlank] = color
+        this.setState({ board: tmp, turn: Math.abs(this.state.turn - 1) })
     }
 
 
     render() {
-        // console.log(this.state.board)
         return (
             <div className="game-board">
                 <div className="columns is-centered">
                     {this.state.board.map((row, i) => (
-                        <Row key={i} data={row} onClick={e => this.onRowClick(i, 'green')}/>
+                        <Row key={i} data={row} onClick={e => this.onRowClick(i)}/>
                     ))}
                 </div>
             </div>
