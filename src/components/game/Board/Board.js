@@ -36,7 +36,7 @@ export default class Board extends React.Component {
             <div className="game-board">
                 <div className="columns is-centered">
                     {this.state.board.map((row, i) => (
-                        <Row key={i} data={row} onClick={this.onRowClick}/>
+                        <Row key={i} data={row} onClick={e=> this.onRowClick(i,'yay')}/>
                     ))}
                 </div>
             </div>

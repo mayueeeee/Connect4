@@ -15,7 +15,7 @@ const Row = props => {
                     props.data.map((color, i) => (
                         <div
                             className="columns"
-                            onClick={e => props.onClick(i, 'yay')}
+                            onClick={props.onClick}
                         >
                             <div className="column is-12">
                                 <Dot key={i} color={color} />
