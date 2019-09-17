@@ -2,7 +2,7 @@ import React from 'react'
 import Board from '../components/game/Board/Board'
 import TreeView from '../components/TreeView/TreeView'
 
-import { create2DArray, createRoot } from '../components/TreeView/treeUtil'
+import { create2DArray } from '../components/TreeView/treeUtil'
 import {
   fillCoin,
   BOARD_SYMBOL,
