@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import Dot from '../Dot'
 import isEmpty from 'lodash/isEmpty'
 import PropTypes from 'prop-types'
