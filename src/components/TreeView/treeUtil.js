@@ -33,7 +33,7 @@ export const createNode = ({ boardState, depth, action }) => {
 
 export const appendNode = ({ root, node, childIndexs }) => {
   let parentNode = root
-
+  console.log(childIndexs)
   const _childIndexs = clone(childIndexs)
 
   // pop root index because root has just one path

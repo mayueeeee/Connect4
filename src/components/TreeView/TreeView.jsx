@@ -58,12 +58,10 @@ export default class TreeView extends Component {
 
     let next = search.next()
     let data = next.value
-    console.log(next)
     let i = 1
 
     while (!next.done) {
       next = search.next()
-      // console.log(next)
       if (next.value) {
         i++
         data = next.value

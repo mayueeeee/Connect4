@@ -192,12 +192,6 @@ export const iterativeDeepeningSearch = function*({ boardState, turn }) {
         const { value } = next
         newInnerState.push(value)
 
-        if (value.skip) {
-          yield { skip: true }
-        } else {
-          yield value
-        }
-
         if (value.winner) {
           return
         }
