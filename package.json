@@ -3,9 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bootstrap": "^4.3.1",
+    "bulma": "^0.7.5",
+    "clone": "^2.1.2",
+    "lodash": "^4.17.15",
+    "node-sass": "^4.12.0",
+    "prop-types": "^15.7.2",
     "react": "^16.9.0",
+    "react-bootstrap": "^1.0.0-beta.12",
+    "react-d3-tree": "^1.14.2",
     "react-dom": "^16.9.0",
-    "react-scripts": "3.1.1"
+    "react-scripts": "3.1.1",
+    "styled-components": "^4.3.2",
+    "uuidv4": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -27,5 +37,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2"
   }
 }
