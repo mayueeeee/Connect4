@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
 const getColorCode = color => {
-    console.log(color)
+    // console.log(color)
     switch (color) {
         case 'green':
             return '#18bc9c'

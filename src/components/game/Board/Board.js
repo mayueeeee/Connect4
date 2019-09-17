@@ -1,4 +1,5 @@
 import React from 'react'
+import lastIndexOf from 'lodash/lastIndexOf'
 import Row from './Row'
 import Dot from '../Dot'
 
@@ -8,7 +9,7 @@ export default class Board extends React.Component {
             .fill(0)
             .map(x => Array(6).fill('blank')),
 
-        turn: 0
+        turn: 0,
     }
 
     yay = () => {
@@ -19,24 +20,37 @@ export default class Board extends React.Component {
     }
 
 
-    onRowClick = (rowNum,color)=>{
+    onRowClick = (rowNum, color) => {
 
-        console.log("Row ",rowNum," Color ",color)
+        console.log('Row ', rowNum, ' Color ', color)
+        const yay = lastIndexOf(this.state.board[rowNum],"blank")
+        let bibi = this.state.board
+        bibi[rowNum][yay] = 'green'
+        this.setState({ board: bibi })
+
+
+
+
+        if(this.state.turn=0){
+            console.log("ai jaa")
+        }
+
+        else{
+            console.log("human jaa")
+        }
+        this.setState({ turn: Math.abs(this.state.turn - 1) },()=>console.log("turn ",this.state.turn))
 
 
     }
 
 
-
-
-
     render() {
-        console.log(this.state.board)
+        // console.log(this.state.board)
         return (
             <div className="game-board">
                 <div className="columns is-centered">
                     {this.state.board.map((row, i) => (
-                        <Row key={i} data={row} onClick={e=> this.onRowClick(i,'yay')}/>
+                        <Row key={i} data={row} onClick={e => this.onRowClick(i, 'green')}/>
                     ))}
                 </div>
             </div>
