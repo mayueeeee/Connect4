@@ -44,12 +44,11 @@ export default class TreeView extends Component {
         y: 90,
       },
     })
-    this.runSearch()
   }
 
-  runSearch = async () => {
+  runSearch = async ({ boardState = this.state.boardState[0].boardState }) => {
     const search = searchTree({
-      root: createRoot(this.state.boardState[0].boardState)[0],
+      root: createRoot(boardState)[0],
       limit: this.state.searchLimit,
       turn: BOARD_SYMBOL.AI,
       searchFunction: SEARCH_FUCNTION[this.state.searchOption],

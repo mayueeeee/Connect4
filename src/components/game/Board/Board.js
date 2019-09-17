@@ -3,35 +3,22 @@ import lastIndexOf from 'lodash/lastIndexOf'
 import Row from './Row'
 
 export default class Board extends React.Component {
-    state = {
-        board: Array(7)
-            .fill(0)
-            .map(x => Array(6).fill('blank')),
-        turn: 0,
-    }
 
-    onRowClick = (rowNum) => {
-        const color = this.state.turn === 0 ? 'red' : 'green'
-        console.log('Row ', rowNum, ' Color ', color)
-        const lastBlank = lastIndexOf(this.state.board[rowNum], 'blank')
-        if(lastBlank>=0){
-            let tmp = this.state.board
-            tmp[rowNum][lastBlank] = color
-            this.setState({ board: tmp, turn: Math.abs(this.state.turn - 1) })
-        }
-    }
+  onRowClick = rowNum => {
+    this.props.onRowClick(rowNum)
+  }
 
+  render() {
+    const { board } = this.props
 
-    render() {
-        console.log(this.state.board)
-        return (
-            <div className="game-board">
-                <div className="columns is-centered">
-                    {this.state.board.map((row, i) => (
-                        <Row key={i} data={row} onClick={e => this.onRowClick(i)}/>
-                    ))}
-                </div>
-            </div>
-        )
-    }
+    return (
+      <div className="game-board">
+        <div className="columns is-centered">
+          {board.map((row, i) => (
+            <Row key={i} data={row} onClick={e => this.onRowClick(i)} />
+          ))}
+        </div>
+      </div>
+    )
+  }
 }
