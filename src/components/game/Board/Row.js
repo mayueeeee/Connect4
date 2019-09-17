@@ -10,6 +10,7 @@ const Row = props => {
                 {!isEmpty(props.data) &&
                 props.data.map((symbol, i) => (
                     <div
+                        key={`row_${i}`}
                         className="columns"
                         onClick={props.onClick}
                     >

@@ -62,7 +62,7 @@ const countConnect = ({ boardState, x, y, direction }) => {
 
 // return winner player
 // if there're no winner return null
-const checkWinner = boardState => {
+export const checkWinner = boardState => {
   const directions = Object.keys(CHECK_DIRECTION)
 
   for (let y = 0; y < BOARD_SIZE.y; y++) {
@@ -88,8 +88,11 @@ const checkWinner = boardState => {
 
 // TODO : Implement
 // For now just select most right
-export const chooseBestAction = root => {
-  return root._children.length - 1
+export const chooseBestAction = winPath => {
+  if(winPath.length === 1){
+    return winPath[0]
+  }
+  return winPath[1]
 }
 
 export const fillCoin = ({ boardState, nColumn, symbol }) => {
@@ -110,7 +113,6 @@ export const deptLimitSearch = function*({
   boardState,
   limit,
   turn,
-  prevAction,
   currentDepth = 0,
   childIndexs = [0],
 }) {
@@ -119,37 +121,45 @@ export const deptLimitSearch = function*({
   for (let x = 0; x < BOARD_SIZE.x; x++) {
     const newState = fillCoin({ boardState, nColumn: x, symbol: turn })
 
-    if (!newState.isFilled) {
-      return
+    if (newState.isFilled) {
+      const _childIndexs = clone(childIndexs)
+
+      const winner = checkWinner(newState.boardState)
+      yield {
+        boardState: newState.boardState,
+        action: x,
+        depth: currentDepth,
+        winner,
+        childIndexs: _childIndexs,
+      }
+
+      // if there're winner stop searching
+      if (winner) {
+        return
+      }
+
+      _childIndexs.push(x)
+
+      yield* deptLimitSearch({
+        boardState: newState.boardState,
+        limit,
+        turn:
+          turn === BOARD_SYMBOL.HUMAN ? BOARD_SYMBOL.AI : BOARD_SYMBOL.HUMAN,
+        currentDepth: currentDepth + 1,
+        prevAction: x,
+        childIndexs: _childIndexs,
+      })
+    } else {
+      yield {
+        boardState: boardState,
+        action: x,
+        depth: currentDepth,
+        winner: null,
+        childIndexs: childIndexs,
+        skip: true,
+      }
+      continue
     }
-
-    const _childIndexs = clone(childIndexs)
-
-    const winner = checkWinner(newState.boardState)
-    yield {
-      boardState: newState.boardState,
-      action: x,
-      depth: currentDepth,
-      winner,
-      prevAction,
-      childIndexs: _childIndexs,
-    }
-
-    // if there're winner stop searching
-    if (winner) {
-      return
-    }
-
-    _childIndexs.push(x)
-
-    yield* deptLimitSearch({
-      boardState: newState.boardState,
-      limit,
-      turn: turn === BOARD_SYMBOL.HUMAN ? BOARD_SYMBOL.AI : BOARD_SYMBOL.HUMAN,
-      currentDepth: currentDepth + 1,
-      prevAction: x,
-      childIndexs: _childIndexs,
-    })
   }
 }
 
@@ -219,17 +229,19 @@ export const searchTree = function*({ root, limit, turn, searchFunction }) {
   while (!next.done) {
     const { boardState, action, depth, winner, childIndexs } = next.value
 
-    yield appendNode({
+    const newTree = appendNode({
       root,
       node: createNode({ boardState, depth, action }),
       childIndexs,
       winner,
     })
 
-    // Stop searching when AI win
     if (winner === BOARD_SYMBOL.AI) {
-      return
+      newTree.winPath = childIndexs
+      return newTree
     }
+
+    yield newTree
 
     next = searchGenerator.next()
   }

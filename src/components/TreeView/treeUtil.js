@@ -1,7 +1,6 @@
 import uuid from 'uuidv4'
 import clone from 'clone'
 import { BOARD_SYMBOL, BOARD_SIZE } from './gameUtil'
-import { range } from 'rxjs'
 
 export const create2DArray = (fill = BOARD_SYMBOL.FREE) => {
   const arr = new Array(BOARD_SIZE.y)

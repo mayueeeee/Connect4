@@ -58,15 +58,15 @@ export default class TreeView extends Component {
 
     let next = search.next()
     let data = next.value
-
+    console.log(next)
     let i = 1
 
     while (!next.done) {
       next = search.next()
+      // console.log(next)
       if (next.value) {
         i++
         data = next.value
-
         if (this.state.isShowStep) {
           await this.tree.setState({ data })
           await delay(50)
@@ -76,7 +76,6 @@ export default class TreeView extends Component {
 
     console.log(`Searched ${i} possible ways`)
     console.timeEnd('time used')
-
     const root = data[0]
 
     if (this.state.visualOption === 0) {
@@ -84,13 +83,12 @@ export default class TreeView extends Component {
     }
 
     this.tree.setState({ data: data })
-
-    const action = chooseBestAction(root)
-
+    const action = chooseBestAction(data.winPath)
+    
     const newState = fillCoin({
       boardState: root.boardState,
       nColumn: action,
-      symbol: this.state.turn,
+      symbol: BOARD_SYMBOL.AI,
     })
 
     return newState
