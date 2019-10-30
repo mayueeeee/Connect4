@@ -77,6 +77,7 @@ class Board {
     this.turn = turn
     this.score = score
   }
+
   changeTurn() {
     this.turn =
       this.turn === BOARD_SYMBOL.FREE
@@ -85,6 +86,7 @@ class Board {
         ? BOARD_SYMBOL.AI
         : BOARD_SYMBOL.HUMAN
   }
+
   fillCoin(position) {
     if (position < 0 && position > BOARD_SIZE.x - 1) return 'Underflow'
 
@@ -99,10 +101,12 @@ class Board {
 }
 
 class Tree {
-  constructor(board = new Board(), rootNode = new Node(board)) {
+  constructor(board = new Board(), rootNode = new Node(board), debug = false) {
     this.rootNode = rootNode
     this.maxStack = 0
+    this.debug = debug
   }
+
   depthLimitSearch(limit, board = this.rootNode.value) {
     this.maxStack = 0
     const stack = new Stack()
@@ -116,6 +120,7 @@ class Tree {
       const depth = stack.peek().depth + 1
       const node = stack.pop()
       const parent = node.parent
+
       if (parent != null) parent.addChild(node)
       const _board = clone(node.value)
       _board.changeTurn()
@@ -128,21 +133,27 @@ class Tree {
 
         count++
         // print children
-        console.log(
-          'depth : ',
-          stack.peek().depth,
-          ' value : ',
-          stack.peek().value.boardState
-        )
+        if (this.debug) {
+          console.log(
+            'depth : ',
+            stack.peek().depth,
+            ' value : ',
+            stack.peek().value.boardState
+          )
+        }
       }
-      console.log('---------------------------------------')
+      if (this.debug) {
+        console.log('---------------------------------------')
+      }
 
       while (!stack.isEmpty() && stack.peek().depth === limit) {
         node.addChild(stack.pop())
       }
 
       // Total number of nodes But not including the root node
-      console.log('count', count)
+      if (this.debug) {
+        console.log('count', count)
+      }
     }
     // // print children
     // const r = rootNode.children[0].children[0]

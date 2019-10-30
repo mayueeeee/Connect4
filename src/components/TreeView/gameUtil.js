@@ -54,7 +54,7 @@ const _calculatePoint = ({ board, x, y }) => {
 
       if (scanedBlock < 3) directionScore = 0
 
-      // if (connectedBlock >= 3) directionScore = 100
+      if (connectedBlock >= 3) directionScore = 100
 
       return directionScore
     })
