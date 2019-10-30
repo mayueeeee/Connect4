@@ -103,13 +103,12 @@ class Tree {
     this.rootNode = rootNode
     this.maxStack = 0
   }
-  depthLimitSearch(limit, board = this.rootNode.value) {
+  depthLimitSearch(limit) {
     this.maxStack = 0
     const stack = new Stack()
-    const rootNode = new Node(board)
     let count = 0
 
-    stack.push(rootNode)
+    stack.push(this.rootNode)
     if (stack.size() > this.maxStack) this.maxStack = stack.size()
 
     while (!stack.isEmpty()) {
@@ -127,15 +126,15 @@ class Tree {
         if (stack.size() > this.maxStack) this.maxStack = stack.size()
 
         count++
-        // print children
-        console.log(
-          'depth : ',
-          stack.peek().depth,
-          ' value : ',
-          stack.peek().value.boardState
-        )
+        // // print children
+        // console.log(
+        //   'depth : ',
+        //   stack.peek().depth,
+        //   ' value : ',
+        //   stack.peek().value.boardState
+        // )
       }
-      console.log('---------------------------------------')
+      // console.log('---------------------------------------')
 
       while (!stack.isEmpty() && stack.peek().depth === limit) {
         node.addChild(stack.pop())
@@ -150,8 +149,11 @@ class Tree {
     //   console.log('c : ', c, 'child', r.children[c].value.boardState)
     // }
   }
+
+  iterativeDeepeningSearch() {}
 }
 
 const t = new Tree()
 t.depthLimitSearch((limit = 3))
 console.log('max', t.maxStack)
+console.log('max', t.rootNode)
