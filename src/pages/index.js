@@ -81,8 +81,7 @@ export default class IndexPage extends React.Component {
           timeUsed: Date.now() - startTime,
         }
         let stackTrace = this.state.stackTrace
-        // stackTrace.append(stackFrame)
-        // console.log("stackTrace")
+        stackTrace.push(stackFrame)
         this.setState({
           winner,
           gameState: newGameState,
