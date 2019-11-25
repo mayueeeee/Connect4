@@ -21,26 +21,66 @@ export default props => (
           </tr>
         ))}
       {!isNull(props.trace) && props.winner && (
-        <tr>
-          <td>
-            <b>avg</b>
-          </td>
-          <td>
-            <b>
-              {props.trace.reduce((total, next) => total + next.maxStack, 0) /
-                props.trace.length}
-            </b>
-          </td>
-          <td>
-            <b>
-              {(
-                props.trace.reduce((total, next) => total + next.timeUsed, 0) /
-                props.trace.length
-              ).toFixed(2)}{' '}
-              ms
-            </b>
-          </td>
-        </tr>
+        <>
+          <tr>
+            <td>
+              <b>avg</b>
+            </td>
+            <td>
+              <b>
+                {(
+                  props.trace.reduce(
+                    (total, next) => total + next.maxStack,
+                    0
+                  ) / props.trace.length
+                ).toFixed(2)}
+              </b>
+            </td>
+            <td>
+              <b>
+                {(
+                  props.trace.reduce(
+                    (total, next) => total + next.timeUsed,
+                    0
+                  ) / props.trace.length
+                ).toFixed(2)}{' '}
+                ms
+              </b>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>max</b>
+            </td>
+            <td>
+              <b>
+                {Math.max.apply(Math, props.trace.map(ele => ele.maxStack))}
+              </b>
+            </td>
+            <td>
+              <b>
+                {Math.max.apply(Math, props.trace.map(ele => ele.timeUsed))} ms
+              </b>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <b>min</b>
+            </td>
+            <td>
+              <b>
+                {Math.min.apply(Math, props.trace.map(ele => ele.maxStack))}
+              </b>
+            </td>
+            <td>
+              <b>
+                {Math.min.apply(Math, props.trace.map(ele => ele.timeUsed))} ms
+              </b>
+            </td>
+          </tr>
+        </>
       )}
     </tbody>
   </Table>
