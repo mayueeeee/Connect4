@@ -1,6 +1,6 @@
 import React from 'react'
 import Board from '../components/game/Board/Board'
-import { Navbar, NavDropdown } from 'react-bootstrap'
+import { Navbar, NavDropdown, Row, Col } from 'react-bootstrap'
 
 import {
   BOARD_SYMBOL,
@@ -8,6 +8,7 @@ import {
   checkWinner,
 } from '../components/TreeView/gameUtil'
 import { Tree, Board as GameBoard } from '../components/TreeView/stack'
+import StackTable from '../components/StackTable/StackTable'
 
 const WINNER_TEXT = ['', 'HUMAN', 'AI']
 const HEURICTIC_SEARCH = [
@@ -29,6 +30,7 @@ export default class IndexPage extends React.Component {
     limit: 4,
     maxStack: 0,
     timeUsed: 0,
+    stackTrace: [],
   }
 
   handleChange = (field, value) => {
@@ -73,20 +75,35 @@ export default class IndexPage extends React.Component {
         newGameState = _newGameState
       }
       winner = checkWinner(newGameState.boardState)
-      if (winner !== null) {   
+      if (winner !== null) {
+        const stackFrame = {
+          maxStack: tree.maxStack,
+          timeUsed: Date.now() - startTime,
+        }
+        let stackTrace = this.state.stackTrace
+        // stackTrace.append(stackFrame)
+        // console.log("stackTrace")
         this.setState({
           winner,
           gameState: newGameState,
-          maxStack: tree.maxStack,
-          timeUsed: Date.now() - startTime,
+          maxStack: stackFrame.maxStack,
+          timeUsed: stackFrame.timeUsed,
+          stackTrace: stackTrace,
         })
         return
       }
     }
-    this.setState({
-      gameState: newGameState,
+    const stackFrame = {
       maxStack: tree.maxStack,
       timeUsed: Date.now() - startTime,
+    }
+    let stackTrace = this.state.stackTrace
+    stackTrace.push(stackFrame)
+    this.setState({
+      gameState: newGameState,
+      maxStack: stackFrame.maxStack,
+      timeUsed: stackFrame.timeUsed,
+      stackTrace: stackTrace,
     })
 
     window.tree = tree
@@ -138,10 +155,18 @@ export default class IndexPage extends React.Component {
               </div>
             </Navbar>
           </div>
-          <Board
-            board={this.state.gameState.boardState}
-            onRowClick={this.onRowClick}
-          />
+          <Row>
+            <Col xs={8}>
+              <Board
+                board={this.state.gameState.boardState}
+                onRowClick={this.onRowClick}
+              />
+            </Col>
+            <Col xs={3} className="stack-col">
+              <StackTable trace={this.state.stackTrace} />
+            </Col>
+          </Row>
+
           <div style={{ width: '100%', textAlign: 'center' }}>
             {winner !== null && <h1>Winner : {WINNER_TEXT[winner]}</h1>}
           </div>
