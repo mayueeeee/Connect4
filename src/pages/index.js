@@ -160,6 +160,9 @@ export default class IndexPage extends React.Component {
                 board={this.state.gameState.boardState}
                 onRowClick={this.onRowClick}
               />
+              <div style={{ width: '100%', textAlign: 'center' }}>
+                {winner !== null && <h1>Winner : {WINNER_TEXT[winner]}</h1>}
+              </div>
             </Col>
             <Col xs={3} className="stack-col">
               <StackTable
@@ -168,10 +171,6 @@ export default class IndexPage extends React.Component {
               />
             </Col>
           </Row>
-
-          <div style={{ width: '100%', textAlign: 'center' }}>
-            {winner !== null && <h1>Winner : {WINNER_TEXT[winner]}</h1>}
-          </div>
         </div>
       </div>
     )
