@@ -1,4 +1,6 @@
-const clone = require('clone')
+import clone from 'clone'
+import { calculateBoardScore } from './gameUtil'
+
 const BOARD_SIZE = {
   x: 7,
   y: 6,
@@ -65,26 +67,22 @@ class Node {
   }
 }
 
-class Board {
+export class Board {
   constructor(
     boardState = new Array(BOARD_SIZE.y)
       .fill(0)
       .map(() => new Array(BOARD_SIZE.x).fill(0)),
-    turn = BOARD_SYMBOL.FREE,
-    score = 0
+    turn = BOARD_SYMBOL.HUMAN
   ) {
     this.boardState = boardState
     this.turn = turn
-    this.score = score
+    this.action = -1
+    this.score = calculateBoardScore(this.boardState)
   }
 
   changeTurn() {
     this.turn =
-      this.turn === BOARD_SYMBOL.FREE
-        ? BOARD_SYMBOL.HUMAN
-        : this.turn === BOARD_SYMBOL.HUMAN
-        ? BOARD_SYMBOL.AI
-        : BOARD_SYMBOL.HUMAN
+      this.turn === BOARD_SYMBOL.HUMAN ? BOARD_SYMBOL.AI : BOARD_SYMBOL.HUMAN
   }
 
   fillCoin(position) {
@@ -92,30 +90,35 @@ class Board {
 
     let row = BOARD_SIZE.y - 1
 
+    if (this.boardState[0][position] !== BOARD_SYMBOL.FREE) {
+      return 'Full'
+    }
+
     while (row > 0 && this.boardState[row][position] != BOARD_SYMBOL.FREE) row--
 
     this.boardState[row][position] = this.turn
-
+    this.score = calculateBoardScore(this.boardState)
+    this.action = position
     return clone(this)
   }
 }
 
-class Tree {
-  constructor(board = new Board(), rootNode = new Node(board)) {
-    this.tempNode = clone(rootNode)
-    this.rootNode = rootNode
+export class Tree {
+  constructor(board = new Board()) {
+    this.rootNode = new Node(board)
+    this.tempNode = clone(this.rootNode)
     this.maxStack = 0
-    this.debug = debug
   }
+
   clear() {
     this.rootNode = clone(this.tempNode)
     this.maxStack = 0
   }
+
   depthLimitSearch(limit) {
     this.clear()
 
     const stack = new Stack()
-    let count = 0
 
     stack.push(this.rootNode)
     if (stack.size() > this.maxStack) this.maxStack = stack.size()
@@ -130,36 +133,30 @@ class Tree {
       _board.changeTurn()
 
       for (let x = BOARD_SIZE.x - 1; x >= 0; x--) {
-        const child = new Node(clone(_board).fillCoin(x), depth)
+        const newBoard = clone(_board).fillCoin(x)
+
+        if (newBoard === 'Full') {
+          continue
+        }
+        const child = new Node(newBoard, depth)
         child.setParentNode(node)
         stack.push(child)
         if (stack.size() > this.maxStack) this.maxStack = stack.size()
 
-        count++
         // print children
-        console.log(
-          'depth : ',
-          stack.peek().depth,
-          ' value : ',
-          stack.peek().value.boardState
-        )
+        // console.log(
+        //   'depth : ',
+        //   stack.peek().depth,
+        //   ' value : \n',
+        //   stack.peek().value.boardState
+        // )
       }
-      console.log('---------------------------------------')
+      // console.log('---------------------------------------')
 
       while (!stack.isEmpty() && stack.peek().depth === limit) {
         node.addChild(stack.pop())
       }
-
-      // Total number of nodes But not including the root node
-      if (this.debug) {
-        console.log('count', count)
-      }
     }
-    // // print children
-    // const r = rootNode.children[0].children[0]
-    // for (let c = 0; c < r.children.length; c++) {
-    //   console.log('c : ', c, 'child', r.children[c].value.boardState)
-    // }
   }
 
   iterativeDeepeningSearch(limit) {
@@ -168,11 +165,72 @@ class Tree {
       this.depthLimitSearch(l)
       storeMaxStack.push(this.maxStack)
     }
-    console.log('storeMaxStack', storeMaxStack)
+    // console.log('storeMaxStack', storeMaxStack)
+  }
+
+  getNodeScore = node => {
+    let currentScore = node.value.score
+    currentScore = currentScore.aiScore - currentScore.humanScore
+
+    let bestScore = 0
+
+    for (let i = 0; i < node.children.length; i++) {
+      let score = node.children[i].value.score
+      score = score.aiScore - score.humanScore
+
+      score += this.getNodeScore(node.children[i])
+
+      if (score > bestScore) {
+        bestScore = score
+      }
+    }
+
+    return bestScore + currentScore
+  }
+
+  minimax = () => {
+    const possibleNode = this.rootNode.children
+
+    // No posible move
+    if (possibleNode.length === 0) {
+      return -1
+    }
+
+    let bestAction = -1
+    let bestScore = Number.NEGATIVE_INFINITY
+
+    for (let i = 0; i < possibleNode.length; i++) {
+      const score = this.getNodeScore(possibleNode[i])
+
+      if (score > bestScore) {
+        bestScore = score
+        bestAction = possibleNode[i].value.action
+      }
+    }
+
+    return { bestAction, bestScore }
+  }
+
+  greedyBestFirst = () => {
+    const possibleNode = this.rootNode.children
+
+    // No posible move
+    if (possibleNode.length === 0) {
+      return -1
+    }
+
+    let bestAction = -1
+    let bestScore = Number.NEGATIVE_INFINITY
+
+    for (let i = 0; i < possibleNode.length; i++) {
+      if (possibleNode[i].value.score > bestScore) {
+        bestScore = possibleNode[i].value.score
+        bestAction = possibleNode[i].value.action
+      }
+    }
+
+    return { bestAction, bestScore }
+
+
   }
 }
-
-const t = new Tree()
-t.iterativeDeepeningSearch((limit = 5))
-// console.log('max', t.maxStack)
-console.log('max', t.rootNode)
