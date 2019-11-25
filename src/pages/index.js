@@ -163,7 +163,10 @@ export default class IndexPage extends React.Component {
               />
             </Col>
             <Col xs={3} className="stack-col">
-              <StackTable trace={this.state.stackTrace} />
+              <StackTable
+                trace={this.state.stackTrace}
+                winner={this.state.winner}
+              />
             </Col>
           </Row>
 
