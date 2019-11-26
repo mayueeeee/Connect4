@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import Node from './Node'
 import Tree from 'react-d3-tree'
-import { createRoot, collapseTree, create2DArray } from './treeUtil'
-import { NavDropdown, Navbar, Form, InputGroup, Button } from 'react-bootstrap'
+// import { createRoot, collapseTree, create2DArray } from './treeUtil'
+// import { NavDropdown, Navbar, Form, InputGroup, Button } from 'react-bootstrap'
 
 import {
   searchTree,
@@ -46,72 +46,6 @@ export default class TreeView extends Component {
     })
   }
 
-  runSearch = async ({ boardState = this.state.boardState[0].boardState }) => {
-    const search = searchTree({
-      root: createRoot(boardState)[0],
-      limit: this.state.searchLimit,
-      turn: BOARD_SYMBOL.AI,
-      searchFunction: SEARCH_FUCNTION[this.state.searchOption],
-    })
-
-    console.time('time used')
-
-    let next = search.next()
-    let data = next.value
-    let i = 1
-
-    while (!next.done) {
-      next = search.next()
-      if (next.value) {
-        i++
-        data = next.value
-        if (this.state.isShowStep) {
-          await this.tree.setState({ data })
-          await delay(50)
-        }
-      }
-    }
-
-    console.log(`Searched ${i} possible ways`)
-    console.timeEnd('time used')
-    const root = data[0]
-
-    if (this.state.visualOption === 0) {
-      collapseTree(root)
-    }
-
-    this.tree.setState({ data: data })
-    const action = chooseBestAction(data.winPath)
-    
-    const newState = fillCoin({
-      boardState: root.boardState,
-      nColumn: action,
-      symbol: BOARD_SYMBOL.AI,
-    })
-
-    return newState
-  }
-
-  handleChange = (field, value) => {
-    this.setState({
-      [field]: value,
-    })
-  }
-
-  renderSearchLimit = () => {
-    const elements = []
-    for (let i = 3; i <= 10; i++) {
-      elements.push(
-        <NavDropdown.Item
-          key={`search_limit_${i}`}
-          onClick={() => this.setState({ searchLimit: i })}
-        >
-          {i}
-        </NavDropdown.Item>
-      )
-    }
-    return elements
-  }
 
   render() {
     const { boardState } = this.state

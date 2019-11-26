@@ -1,17 +1,3 @@
-import clone from 'clone'
-import { appendNode, createNode } from './treeUtil'
-
-// Max depth for AI to search
-export const MAX_DEPTH = 7
-
-// Max depth for tree visualize
-export const MAX_VISUALIZE_DEPTH = 3
-
-export const BOARD_SIZE = {
-  x: 7,
-  y: 6,
-}
-
 export const BOARD_SYMBOL = {
   FREE: 0,
   HUMAN: 1,
@@ -23,10 +9,15 @@ const DIRECTION = {
   DOWN: { x: 0, y: 1 },
   LEFT: { x: -1, y: 0 },
   RIGHT: { x: 1, y: 0 },
-  UPRIGHT: { x: 1, y: -1 },
   UPLEFT: { x: -1, y: -1 },
-  DOWNRIGHT: { x: 1, y: 1 },
+  UPRIGHT: { x: 1, y: -1 },
   DOWNLEFT: { x: -1, y: 1 },
+  DOWNRIGHT: { x: 1, y: 1 },
+}
+
+export const BOARD_SIZE = {
+  x: 7,
+  y: 6,
 }
 
 const CHECK_DIRECTION = {
@@ -86,165 +77,70 @@ export const checkWinner = boardState => {
   return null
 }
 
-// TODO : Implement
-// For now just select most right
-export const chooseBestAction = winPath => {
-  if(winPath.length === 1){
-    return winPath[0]
-  }
-  return winPath[1]
-}
+const _calculateScore = ({ board, x, y }) => {
+  const player = board[y][x]
 
-export const fillCoin = ({ boardState, nColumn, symbol }) => {
-  let _boardState = clone(boardState)
+  const score = Object.keys(DIRECTION)
+    .map(_direction => {
+      const direction = DIRECTION[_direction]
 
-  for (let y = BOARD_SIZE.y - 1; y >= 0; y--) {
-    const boardRow = _boardState[y]
-    if (boardRow[nColumn] === BOARD_SYMBOL.FREE) {
-      boardRow[nColumn] = symbol
-      return { boardState: _boardState, isFilled: true }
-    }
-  }
+      let _x = x + direction.x
+      let _y = y + direction.y
+      let directionScore = 0
+      let scanedBlock = 0
+      let connectedBlock = 0
+      let isCountScore = true
 
-  return { boardState: _boardState, isFilled: false }
-}
-
-export const deptLimitSearch = function*({
-  boardState,
-  limit,
-  turn,
-  currentDepth = 0,
-  childIndexs = [0],
-}) {
-  if (currentDepth === limit) return
-
-  for (let x = 0; x < BOARD_SIZE.x; x++) {
-    const newState = fillCoin({ boardState, nColumn: x, symbol: turn })
-
-    if (newState.isFilled) {
-      const _childIndexs = clone(childIndexs)
-
-      const winner = checkWinner(newState.boardState)
-      yield {
-        boardState: newState.boardState,
-        action: x,
-        depth: currentDepth,
-        winner,
-        childIndexs: _childIndexs,
-      }
-
-      // if there're winner stop searching
-      if (winner) {
-        return
-      }
-
-      _childIndexs.push(x)
-
-      yield* deptLimitSearch({
-        boardState: newState.boardState,
-        limit,
-        turn:
-          turn === BOARD_SYMBOL.HUMAN ? BOARD_SYMBOL.AI : BOARD_SYMBOL.HUMAN,
-        currentDepth: currentDepth + 1,
-        prevAction: x,
-        childIndexs: _childIndexs,
-      })
-    } else {
-      yield {
-        boardState: boardState,
-        action: x,
-        depth: currentDepth,
-        winner: null,
-        childIndexs: childIndexs,
-        skip: true,
-      }
-      continue
-    }
-  }
-}
-
-export const iterativeDeepeningSearch = function*({ boardState, turn }) {
-  let newStates = [{ boardState, action: 0, childIndexs: [0] }]
-
-  let currentDepth = 0
-  let currentLimit = 1
-
-  while (true) {
-    const newInnerState = []
-
-    for (let x = 0; x < newStates.length; x++) {
-      let cIndexs = newStates[x].childIndexs
-      if (currentDepth === 0) {
-        cIndexs = [x]
-      }
-
-      const DLS = deptLimitSearch({
-        boardState: newStates[x].boardState,
-        turn,
-        prevAction: newStates[x].action,
-        currentDepth: currentDepth,
-        limit: currentLimit,
-        childIndexs: cIndexs,
-      })
-
-      let next = DLS.next()
-      while (!next.done) {
-        const { value } = next
-        newInnerState.push(value)
-
-        if (value.winner) {
-          return
+      while (_x < BOARD_SIZE.x && _y < BOARD_SIZE.y && _x > -1 && _y > -1) {
+        if (board[_y][_x] === player) {
+          directionScore++
+          connectedBlock++
+        } else if (board[_y][_x] === BOARD_SYMBOL.FREE) {
+          if (isCountScore) {
+            directionScore += 0.5
+            isCountScore = false
+          }
+        } else {
+          break
         }
 
-        next = DLS.next()
+        _x += direction.x
+        _y += direction.y
+        scanedBlock++
+      }
+
+      if (scanedBlock < 3) directionScore = 0
+
+      if (connectedBlock >= 3) directionScore = 100
+
+      return directionScore
+    })
+    .reduce((a, b) => a + b, 0)
+
+  // console.log(`x : ${x} y : ${y} player : ${player} score : ${score}`)
+
+  return score
+}
+
+export const calculateBoardScore = board => {
+  let humanScore = 0
+  let aiScore = 0
+
+  for (let y = 0; y < BOARD_SIZE.y; y++) {
+    for (let x = 0; x < BOARD_SIZE.x; x++) {
+      const player = board[y][x]
+      if (player !== BOARD_SYMBOL.FREE) {
+        const score = _calculateScore({ board, x, y })
+
+        if (player === BOARD_SYMBOL.HUMAN) humanScore += score
+        if (player === BOARD_SYMBOL.AI) aiScore += score
       }
     }
-
-    if (newInnerState.length === 0) {
-      return
-    }
-    newStates = newInnerState
-
-    currentLimit += 1
-    currentDepth += 1
-    turn = turn === BOARD_SYMBOL.HUMAN ? BOARD_SYMBOL.AI : BOARD_SYMBOL.HUMAN
   }
+
+  return { humanScore, aiScore }
 }
 
-export const searchTree = function*({ root, limit, turn, searchFunction }) {
-  const searchGenerator = searchFunction({
-    boardState: root.boardState,
-    turn,
-    limit: limit,
-  })
-
-  let next = searchGenerator.next()
-
-  while (!next.done) {
-    const { boardState, action, depth, winner, childIndexs } = next.value
-
-    const newTree = appendNode({
-      root,
-      node: createNode({ boardState, depth, action }),
-      childIndexs,
-      winner,
-    })
-
-    if (winner === BOARD_SYMBOL.AI) {
-      newTree.winPath = childIndexs
-      return newTree
-    }
-
-    yield newTree
-
-    next = searchGenerator.next()
-  }
-}
-
-export const delay = ms => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve()
-    }, ms)
-  })
+export const canFill = (boardState, col) => {
+  return boardState[0][col] === BOARD_SYMBOL.FREE
 }

@@ -14,8 +14,6 @@ export const create2DArray = (fill = BOARD_SYMBOL.FREE) => {
   return arr
 }
 
-export const INIT_GAME_STATE = create2DArray()
-
 export const createRoot = boardState => {
   return [
     {
