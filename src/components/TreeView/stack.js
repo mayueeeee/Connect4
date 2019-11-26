@@ -1,5 +1,5 @@
 import clone from 'clone'
-import { calculateBoardScore } from './gameUtil'
+import { calculateBoardScore, checkWinner } from './gameUtil'
 
 const BOARD_SIZE = {
   x: 7,
@@ -115,14 +115,14 @@ export class Tree {
     this.maxStack = 0
   }
 
-  depthLimitSearch(limit) {
+  depthLimitSearch(limit, withoutHeuristic = false) {
     this.clear()
 
     const stack = new Stack()
 
     stack.push(this.rootNode)
     if (stack.size() > this.maxStack) this.maxStack = stack.size()
-
+    let lastestFillCol = 0
     while (!stack.isEmpty()) {
       const depth = stack.peek().depth + 1
       const node = stack.pop()
@@ -132,16 +132,31 @@ export class Tree {
       const _board = clone(node.value)
       _board.changeTurn()
 
+      
+
       for (let x = BOARD_SIZE.x - 1; x >= 0; x--) {
         const newBoard = clone(_board).fillCoin(x)
 
         if (newBoard === 'Full') {
           continue
         }
+        if (x > lastestFillCol) {
+          lastestFillCol = x
+        }
+
         const child = new Node(newBoard, depth)
         child.setParentNode(node)
         stack.push(child)
         if (stack.size() > this.maxStack) this.maxStack = stack.size()
+
+        if (withoutHeuristic) {
+          const winner = checkWinner(newBoard.boardState)
+          if (winner === BOARD_SYMBOL.AI) {
+            console.log('found win solution\nstop searching\naction:' + x)
+            console.log(newBoard.boardState)
+            return x
+          }
+        }
 
         // print children
         // console.log(
@@ -157,15 +172,19 @@ export class Tree {
         node.addChild(stack.pop())
       }
     }
+    if (withoutHeuristic) {
+      return lastestFillCol
+    }
   }
 
-  iterativeDeepeningSearch(limit) {
+  iterativeDeepeningSearch(limit, withoutHeuristic = false) {
     const storeMaxStack = new Stack()
     for (let l = 1; l <= limit; l++) {
-      this.depthLimitSearch(l)
+      const stopSearch = this.depthLimitSearch(l, withoutHeuristic)
       storeMaxStack.push(this.maxStack)
+      if (stopSearch) return
     }
-    // console.log('storeMaxStack', storeMaxStack)
+    return -1
   }
 
   getNodeScore = node => {
@@ -211,7 +230,7 @@ export class Tree {
     return { bestAction, bestScore }
   }
 
-  greedyBestFirst = () => {
+  findAIWinnerAction = () => {
     const possibleNode = this.rootNode.children
 
     // No posible move
@@ -219,18 +238,30 @@ export class Tree {
       return -1
     }
 
-    let bestAction = -1
-    let bestScore = Number.NEGATIVE_INFINITY
-
-    for (let i = 0; i < possibleNode.length; i++) {
-      if (possibleNode[i].value.score > bestScore) {
-        bestScore = possibleNode[i].value.score
-        bestAction = possibleNode[i].value.action
-      }
+    return {
+      bestAction: possibleNode[possibleNode.length - 1].value.action,
+      bestScore: 0,
     }
-
-    return { bestAction, bestScore }
-
-
   }
+
+  // greedyBestFirst = () => {
+  //   const possibleNode = this.rootNode.children
+
+  //   // No posible move
+  //   if (possibleNode.length === 0) {
+  //     return -1
+  //   }
+
+  //   let bestAction = -1
+  //   let bestScore = Number.NEGATIVE_INFINITY
+
+  //   for (let i = 0; i < possibleNode.length; i++) {
+  //     if (possibleNode[i].value.score > bestScore) {
+  //       bestScore = possibleNode[i].value.score
+  //       bestAction = possibleNode[i].value.action
+  //     }
+  //   }
+
+  //   return { bestAction, bestScore }
+  // }
 }

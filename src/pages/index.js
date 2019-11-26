@@ -11,13 +11,10 @@ import { Tree, Board as GameBoard } from '../components/TreeView/stack'
 import StackTable from '../components/StackTable/StackTable'
 
 const WINNER_TEXT = ['', 'HUMAN', 'AI']
-const HEURICTIC_SEARCH = [
-  { label: 'MINIMAX', value: 'minimax' },
-  { label: 'GBFS', value: 'greedyBestFirst' },
-]
+
 const SEARCH_OPTIONS = [
   { label: 'DLS', value: 'depthLimitSearch' },
-  { label: 'ITDS', value: 'iterativeDeepeningSearch' },
+  { label: 'MINIMAX', value: 'minimax' },
 ]
 
 export default class IndexPage extends React.Component {
@@ -60,13 +57,20 @@ export default class IndexPage extends React.Component {
     const startTime = Date.now()
 
     const tree = new Tree(newGameState)
-    const heuricticSearch = this.state.heuricticOption
-    tree[heuricticSearch](this.state.limit)
+    const searchOption = this.state.searchOption
 
-    tree.iterativeDeepeningSearch(4)
+    if (searchOption === 'minimax') {
+      tree.depthLimitSearch(4, false)
+      tree.minimax()
+      var { bestAction, bestScore } = tree.minimax()
+      console.log(bestAction, bestScore)
+    }
 
-    const { bestAction, bestScore } = tree.minimax()
-    console.log(bestAction, bestScore)
+    if (searchOption === 'depthLimitSearch') {
+      var bestAction = tree.depthLimitSearch(4, true)
+      console.log(bestAction)
+    }
+
     if (bestAction !== -1) {
       newGameState.changeTurn()
       const _newGameState = newGameState.fillCoin(bestAction)
@@ -124,21 +128,6 @@ export default class IndexPage extends React.Component {
                       key={`search_${index}`}
                       onClick={() =>
                         this.handleChange('searchOption', option.value)
-                      }
-                    >
-                      {option.label}
-                    </NavDropdown.Item>
-                  )
-                })}
-              </NavDropdown>
-              <div style={{ fontSize: '11', color: 'white' }}>Heurictic : </div>
-              <NavDropdown title={this.state.heuricticOption}>
-                {HEURICTIC_SEARCH.map((option, index) => {
-                  return (
-                    <NavDropdown.Item
-                      key={`heu_${index}`}
-                      onClick={() =>
-                        this.handleChange('heuricticOption', option.value)
                       }
                     >
                       {option.label}
